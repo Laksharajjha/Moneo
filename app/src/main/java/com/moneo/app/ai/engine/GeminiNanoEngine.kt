@@ -16,9 +16,11 @@ import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import dagger.hilt.android.qualifiers.ApplicationContext
+
 @Singleton
 class GeminiNanoEngine @Inject constructor(
-    private val context: Context,
+    @ApplicationContext private val context: Context,
     private val gson: Gson
 ) : LocalAiEngine {
 
