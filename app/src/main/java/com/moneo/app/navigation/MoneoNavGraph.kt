@@ -96,7 +96,9 @@ fun MoneoNavGraph() {
                 InsightsScreen()
             }
             composable(NavRoutes.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(
+                    onBack = { navController.popBackStack() }
+                )
             }
             composable(
                 route = NavRoutes.TransactionDetail.route,

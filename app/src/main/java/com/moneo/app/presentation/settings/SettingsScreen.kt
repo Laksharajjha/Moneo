@@ -18,8 +18,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+
+// ...
+
 @Composable
 fun SettingsScreen(
+    onBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -38,15 +44,30 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(28.dp)
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
-        Text(
-            text = "Settings",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowBack, 
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = "Settings",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        
+        Column(modifier = Modifier.padding(horizontal = 28.dp)) {
+            Spacer(Modifier.height(16.dp))
         Spacer(Modifier.height(32.dp))
 
         SettingsSection(title = "Privacy") {
@@ -163,6 +184,9 @@ fun SettingsScreen(
 
         SettingsSection(title = "About") {
             SettingsRow(title = "Moneo", subtitle = "v1.0.0 \u00B7 Privacy-first finance")
+        }
+        
+        Spacer(Modifier.height(48.dp))
         }
     }
 }
