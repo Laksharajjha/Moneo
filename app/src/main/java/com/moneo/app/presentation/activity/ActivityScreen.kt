@@ -15,6 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneo.app.domain.model.TimePeriod
 import com.moneo.app.presentation.components.TransactionItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentPaste
 
 @Composable
 fun ActivityScreen(
@@ -24,13 +26,61 @@ fun ActivityScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
+        var showImportDialog by remember { mutableStateOf(false) }
+
         // Header
-        Text(
-            text = "Activity",
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Medium),
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(start = 28.dp, top = 24.dp, bottom = 16.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 28.dp, end = 20.dp, top = 24.dp, bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Activity",
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Medium),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            if (state.selectedTab == ActivityTab.INBOX) {
+                IconButton(onClick = { showImportDialog = true }) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.ContentPaste,
+                        contentDescription = "Import Message",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+
+        if (showImportDialog) {
+            var pasteText by remember { mutableStateOf("") }
+            AlertDialog(
+                onDismissRequest = { showImportDialog = false },
+                title = { Text("Import Message") },
+                text = {
+                    OutlinedTextField(
+                        value = pasteText,
+                        onValueChange = { pasteText = it },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp),
+                        placeholder = { Text("Paste bank message here...") }
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.importMessage(pasteText)
+                        showImportDialog = false
+                    }) {
+                        Text("Import")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showImportDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
 
         // Segmented Control
         ActivitySegmentedControl(

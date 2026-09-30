@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moneo.app.data.local.dao.InboxEventDao
 import com.moneo.app.data.local.entity.InboxEventEntity
 import com.moneo.app.domain.model.TimePeriod
+import com.moneo.app.ai.parser.TransactionParser
 import com.moneo.app.domain.model.Transaction
 import com.moneo.app.domain.usecase.DeleteTransactionUseCase
 import com.moneo.app.domain.usecase.GetTransactionsUseCase
@@ -38,7 +39,8 @@ class ActivityViewModel @Inject constructor(
     private val getTransactions: GetTransactionsUseCase,
     private val deleteTransaction: DeleteTransactionUseCase,
     private val addTransaction: AddTransactionUseCase,
-    private val inboxEventDao: InboxEventDao
+    private val inboxEventDao: InboxEventDao,
+    private val transactionParser: TransactionParser
 ) : ViewModel() {
 
     // ... (unchanged parts)
@@ -115,6 +117,29 @@ class ActivityViewModel @Inject constructor(
     fun dismissInboxEvent(eventId: Long) {
         viewModelScope.launch {
             inboxEventDao.deleteEvent(eventId)
+        }
+    }
+
+    fun importMessage(text: String) {
+        if (text.isBlank()) return
+        viewModelScope.launch {
+            val result = transactionParser.parse(text)
+            if (result.transactions.isNotEmpty()) {
+                val tx = result.transactions.first()
+                val event = InboxEventEntity(
+                    rawText = text,
+                    sourcePackage = "Manual Import",
+                    timestamp = System.currentTimeMillis(),
+                    amountInPaise = tx.amountInPaise,
+                    currency = tx.currency,
+                    type = tx.type.name,
+                    merchant = tx.merchant,
+                    category = tx.category.name,
+                    date = tx.date.toString(),
+                    confidence = tx.confidence
+                )
+                inboxEventDao.insertEvent(event)
+            }
         }
     }
 }
