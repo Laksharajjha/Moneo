@@ -11,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,10 +34,12 @@ fun SettingsScreen(
         }
     }
 
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(28.dp),
+            .padding(28.dp)
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         Text(
@@ -58,6 +62,66 @@ fun SettingsScreen(
             )
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f), thickness = 0.5.dp)
             SettingsRow(title = "Data stays on device", subtitle = "No cloud sync is enabled")
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        val isNotificationEnabled by viewModel.notificationListenerEnabled.collectAsStateWithLifecycle(initialValue = false)
+        val monitoredApps by viewModel.monitoredApps.collectAsStateWithLifecycle(initialValue = emptySet())
+
+        SettingsSection(title = "Intelligence") {
+            SettingsRow(
+                title = "Notification Access",
+                subtitle = "Detect financial activity from notifications",
+                trailingContent = {
+                    Switch(
+                        checked = isNotificationEnabled,
+                        onCheckedChange = { 
+                            viewModel.toggleNotificationListener(it) 
+                            if (it) {
+                                // Prompt user to go to Android Settings
+                                val intent = Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                                context.startActivity(intent)
+                            }
+                        }
+                    )
+                }
+            )
+            if (isNotificationEnabled) {
+                Text(
+                    text = "Moneo can detect financial activity from notifications on your device. Nothing is uploaded to the cloud.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f), thickness = 0.5.dp)
+                
+                val apps = listOf(
+                    "com.google.android.apps.nbu.paisa.user" to "Google Pay",
+                    "com.phonepe.app" to "PhonePe",
+                    "com.sbi.upi" to "SBI",
+                    "com.hdfcbank.payzapp" to "HDFC",
+                    "com.ss.android.ugc.trill" to "Swiggy",
+                    "com.application.zomato" to "Zomato",
+                    "in.amazon.mShop.android.shopping" to "Amazon",
+                    "com.ubercab" to "Uber"
+                )
+                
+                apps.forEach { (packageName, appName) ->
+                    SettingsRow(
+                        title = appName,
+                        subtitle = "Monitor notifications",
+                        trailingContent = {
+                            Checkbox(
+                                checked = monitoredApps.contains(packageName),
+                                onCheckedChange = { isChecked ->
+                                    viewModel.toggleMonitoredApp(packageName, isChecked)
+                                }
+                            )
+                        }
+                    )
+                }
+            }
         }
 
         Spacer(Modifier.height(32.dp))

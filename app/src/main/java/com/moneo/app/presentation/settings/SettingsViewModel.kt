@@ -24,10 +24,30 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val appLockEnabled = preferencesManager.appLockEnabled
+    val notificationListenerEnabled = preferencesManager.notificationListenerEnabled
+    val monitoredApps = preferencesManager.monitoredApps
 
     fun toggleAppLock(enabled: Boolean) {
         viewModelScope.launch {
             preferencesManager.setAppLockEnabled(enabled)
+        }
+    }
+
+    fun toggleNotificationListener(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesManager.setNotificationListenerEnabled(enabled)
+        }
+    }
+
+    fun toggleMonitoredApp(appId: String, enabled: Boolean) {
+        viewModelScope.launch {
+            val current = preferencesManager.monitoredApps.first().toMutableSet()
+            if (enabled) {
+                current.add(appId)
+            } else {
+                current.remove(appId)
+            }
+            preferencesManager.setMonitoredApps(current)
         }
     }
 

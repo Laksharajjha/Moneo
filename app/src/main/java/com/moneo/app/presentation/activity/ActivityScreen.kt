@@ -69,6 +69,15 @@ fun ActivityScreen(
                             item {
                                 EmptyState(message = "No new financial activity detected.")
                             }
+                        } else {
+                            items(state.inboxEvents, key = { it.id }) { event ->
+                                InboxEventItem(
+                                    event = event,
+                                    onApprove = { viewModel.approveInboxEvent(event) },
+                                    onReject = { viewModel.dismissInboxEvent(event.id) },
+                                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp)
+                                )
+                            }
                         }
                     }
                     else -> {
@@ -171,5 +180,61 @@ private fun EmptyState(message: String) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Composable
+fun InboxEventItem(
+    event: com.moneo.app.data.local.entity.InboxEventEntity,
+    onApprove: () -> Unit,
+    onReject: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = event.merchant ?: event.type,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = com.moneo.app.ai.parser.AmountParser.formatPaise(event.amountInPaise),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "via ${event.sourcePackage.split(".").last().replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }} • ${event.category}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = onReject) {
+                    Text("Dismiss", color = MaterialTheme.colorScheme.error)
+                }
+                Spacer(Modifier.width(8.dp))
+                Button(onClick = onApprove) {
+                    Text("Approve")
+                }
+            }
+        }
     }
 }

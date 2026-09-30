@@ -22,10 +22,15 @@ object DatabaseModule {
             context,
             MoneoDatabase::class.java,
             MoneoDatabase.DATABASE_NAME
-        ).fallbackToDestructiveMigration()
+        ).addMigrations(com.moneo.app.data.local.database.Migrations.MIGRATION_2_3)
+         .fallbackToDestructiveMigration()
          .build()
 
     @Provides
     fun provideTransactionDao(database: MoneoDatabase): TransactionDao =
         database.transactionDao()
+        
+    @Provides
+    fun provideInboxEventDao(database: MoneoDatabase): com.moneo.app.data.local.dao.InboxEventDao =
+        database.inboxEventDao()
 }
