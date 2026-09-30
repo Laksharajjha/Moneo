@@ -9,13 +9,15 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+import com.moneo.app.ai.engine.MoneoAiOrchestrator
+
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AiModule {
 
     @Binds
     abstract fun bindLocalAiEngine(
-        engine: GeminiNanoEngine
+        engine: MoneoAiOrchestrator
     ): LocalAiEngine
 
     @Binds

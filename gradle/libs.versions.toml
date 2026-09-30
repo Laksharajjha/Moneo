@@ -21,6 +21,7 @@ ksp = "2.0.20-1.0.25"
 hiltNavigationCompose = "1.2.0"
 aicore = "0.0.1-exp02"
 gson = "2.10.1"
+mediapipe = "0.10.14"
 
 [libraries]
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -57,6 +58,7 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 aicore = { group = "com.google.ai.edge.aicore", name = "aicore", version.ref = "aicore" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+mediapipe-genai = { group = "com.google.mediapipe", name = "tasks-genai", version.ref = "mediapipe" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

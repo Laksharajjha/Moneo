@@ -83,9 +83,10 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.biometric)
 
-    // AICore & JSON
+    // AICore, JSON, & Local LLM (MediaPipe)
     implementation(libs.aicore)
     implementation(libs.gson)
+    implementation(libs.mediapipe.genai)
 
     // Testing
     testImplementation(libs.junit)
