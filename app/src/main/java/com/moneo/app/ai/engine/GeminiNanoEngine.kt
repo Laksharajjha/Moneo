@@ -121,7 +121,10 @@ class GeminiNanoEngine @Inject constructor(
                 Question: "$query"
             """.trimIndent()
             
-            val model = GenerativeModel()
+            val config = generationConfig {
+                temperature = 0.1f
+            }
+            val model = GenerativeModel(generationConfig = config)
             val response = model.generateContent(queryPrompt)
             val jsonText = response.text?.replace("```json", "")?.replace("```", "")?.trim() ?: ""
             
