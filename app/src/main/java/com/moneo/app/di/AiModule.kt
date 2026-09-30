@@ -1,7 +1,7 @@
 package com.moneo.app.di
 
 import com.moneo.app.ai.engine.LocalAiEngine
-import com.moneo.app.ai.engine.StubLocalAiEngine
+import com.moneo.app.ai.engine.GeminiNanoEngine
 import com.moneo.app.ai.parser.SmartTransactionParser
 import com.moneo.app.ai.parser.TransactionParser
 import dagger.Binds
@@ -15,11 +15,19 @@ abstract class AiModule {
 
     @Binds
     abstract fun bindLocalAiEngine(
-        engine: StubLocalAiEngine
+        engine: GeminiNanoEngine
     ): LocalAiEngine
 
     @Binds
     abstract fun bindTransactionParser(
         parser: SmartTransactionParser
     ): TransactionParser
+
+    companion object {
+        @dagger.Provides
+        @javax.inject.Singleton
+        fun provideGson(): com.google.gson.Gson {
+            return com.google.gson.Gson()
+        }
+    }
 }

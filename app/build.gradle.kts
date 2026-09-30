@@ -83,6 +83,10 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.biometric)
 
+    // AICore & JSON
+    implementation(libs.aicore)
+    implementation(libs.gson)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
